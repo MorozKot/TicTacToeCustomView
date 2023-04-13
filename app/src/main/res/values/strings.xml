@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TicTacToeCustomView</string>
+    <string name="random_field">Кнопка</string>
 </resources>
