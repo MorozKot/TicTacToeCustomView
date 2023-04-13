@@ -14,9 +14,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.ticTacToeField.ticTacToeField = TicTacToeField(10, 10)
+        binding.field.ticTacToeField = TicTacToeField(10, 10)
 
-        binding.ticTacToeField.actionListener = { row, column, field ->
+        binding.field.actionListener = { row, column, field ->
             val cell = field.getCell(row, column)
             if (cell == Cell.EMPTY) {
                 if (isFirstPlayer) {
