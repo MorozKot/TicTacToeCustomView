@@ -7,10 +7,13 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.util.TypedValue
+import android.view.MotionEvent
 import android.view.View
 import java.lang.Integer.max
 import kotlin.math.min
 import kotlin.properties.Delegates
+
+typealias onCellActionListener = (row: Int, column: Int, field: TicTacToeField) -> Unit
 
 class TicTacToeView @JvmOverloads constructor(
     context: Context,
@@ -29,6 +32,8 @@ class TicTacToeView @JvmOverloads constructor(
             invalidate()
         }
 
+    var actionListener: onCellActionListener? = null
+
     private var player1Color by Delegates.notNull<Int>()
     private var player2Color by Delegates.notNull<Int>()
     private var gridColor by Delegates.notNull<Int>()
@@ -38,6 +43,7 @@ class TicTacToeView @JvmOverloads constructor(
     private var cellPadding: Float = 0f
 
     private val listener: OnFieldChangedListener = {
+        invalidate()
     }
 
     private val cellRect = RectF()
@@ -165,8 +171,6 @@ class TicTacToeView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        canvas.drawLine(0f, 0f, 100f, 100f, player1Paint)
-
         if (ticTacToeField == null) return
         if (cellSize == 0f) return
         if (fieldRect.width() <= 0) return
@@ -225,6 +229,31 @@ class TicTacToeView @JvmOverloads constructor(
         cellRect.right = cellRect.left + cellSize - cellPadding * 2
         cellRect.bottom = cellRect.top + cellSize - cellPadding * 2
         return cellRect
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        val field = this.ticTacToeField ?: return false
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> return true
+            MotionEvent.ACTION_UP -> {
+                val row = getRow(event)
+                val column = getColumn(event)
+                if (row >= 0 && column >= 0 && row <= field.rows && column <= field.columns) {
+                    actionListener?.invoke(row, column, field)
+                    return true
+                }
+                return false
+            }
+        }
+        return false
+    }
+
+    private fun getRow(event: MotionEvent): Int {
+        return ((event.y - fieldRect.top)/ cellSize).toInt()
+    }
+
+    private fun getColumn(event: MotionEvent): Int {
+        return ((event.x - fieldRect.left)/ cellSize).toInt()
     }
 
     companion object {
